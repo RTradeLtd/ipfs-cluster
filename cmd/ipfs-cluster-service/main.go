@@ -30,7 +30,7 @@ const (
 
 const (
 	stateCleanupPrompt           = "The peer's state will be removed from the load path.  Existing pins may be lost."
-	configurationOverwritePrompt = "Configuration(service.json) will be overwritten."
+	configurationOverwritePrompt = "Configuration(service.json) and Identity(identity.json) will be overwritten."
 )
 
 // We store a commit id here
@@ -106,10 +106,13 @@ var (
 	DefaultPath string
 	// The name of the configuration file inside DefaultPath
 	DefaultConfigFile = "service.json"
+	// The name of the identity file inside DefaultPath
+	DefaultIdentityFile = "identity.json"
 )
 
 var (
-	configPath string
+	configPath   string
+	identityPath string
 )
 
 func init() {
@@ -159,6 +162,26 @@ func main() {
 	app.Description = Description
 	//app.Copyright = "© Protocol Labs, Inc."
 	app.Version = version.Version.String()
+
+	app.Before = func(c *cli.Context) error {
+		absPath, err := filepath.Abs(c.String("config"))
+		if err != nil {
+			return err
+		}
+
+		configPath = filepath.Join(absPath, DefaultConfigFile)
+		identityPath = filepath.Join(absPath, DefaultIdentityFile)
+
+		setupLogLevel(c.String("loglevel"))
+		if c.Bool("debug") {
+			setupDebug()
+		}
+
+		locker = &lock{path: absPath}
+
+		return nil
+	}
+
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "config, c",
@@ -455,24 +478,6 @@ to all effects. Peers may need to bootstrap and sync from scratch after this.
 				return nil
 			},
 		},
-	}
-
-	app.Before = func(c *cli.Context) error {
-		absPath, err := filepath.Abs(c.String("config"))
-		if err != nil {
-			return err
-		}
-
-		configPath = filepath.Join(absPath, DefaultConfigFile)
-
-		setupLogLevel(c.String("loglevel"))
-		if c.Bool("debug") {
-			setupDebug()
-		}
-
-		locker = &lock{path: absPath}
-
-		return nil
 	}
 
 	app.Action = run
