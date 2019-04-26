@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	ipfscluster "github.com/ipfs/ipfs-cluster"
+	"github.com/ipfs/ipfs-cluster/identity"
 	"github.com/ipfs/ipfs-cluster/version"
 
 	semver "github.com/blang/semver"
@@ -264,6 +265,8 @@ configuration.
 					// peerset.
 					mgr := newStateManager("raft", cfgs)
 					checkErr("cleaning up raft data", mgr.Clean())
+
+					identity.Clean(identityPath)
 				}
 
 				// Generate defaults for all registered components
@@ -280,6 +283,13 @@ configuration.
 
 				// Save
 				saveConfig(cfgMgr)
+
+				identity := identity.Identity{}
+				identity.Default()
+				identity.ApplyEnvVars()
+				identity.SaveJSON(identityPath)
+				out("%s identity written to %s\n", programName, identityPath)
+
 				return nil
 			},
 		},

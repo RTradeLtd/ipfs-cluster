@@ -6,10 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	logging "github.com/ipfs/go-log"
 	"github.com/ipfs/ipfs-cluster/config"
+	"github.com/kelseyhightower/envconfig"
 	crypto "github.com/libp2p/go-libp2p-crypto"
 	peer "github.com/libp2p/go-libp2p-peer"
 	pnet "github.com/libp2p/go-libp2p-pnet"
@@ -258,3 +260,37 @@ func EncodeProtectorKey(secretBytes []byte) string {
 
 // 	return cfg.ApplyEnvVars()
 // }
+
+// Clean removes the file at the given path
+func Clean(path string) {
+	os.Remove(path)
+}
+
+// ApplyEnvVars fills in any Config fields found
+// as environment variables.
+func (id *Identity) ApplyEnvVars() error {
+	jID, err := id.toIdentityJSON()
+	if err != nil {
+		return err
+	}
+
+	err = envconfig.Process("CLUSTER", jID)
+	if err != nil {
+		return err
+	}
+
+	return id.applyConfigJSON(jID)
+}
+
+// SaveJSON saves the JSON representation of the Identity to
+// the given path.
+func (id *Identity) SaveJSON(path string) error {
+	logger.Info("Saving configuration")
+
+	bs, err := id.ToJSON()
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(path, bs, 0600)
+}
