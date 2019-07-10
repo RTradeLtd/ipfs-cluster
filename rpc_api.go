@@ -119,6 +119,12 @@ type ClusterRPCAPI struct {
 	c *Cluster
 }
 
+// NewPinTrackerRPCAPI is a helper function to implement the
+// PinTrackerRPCAPI calls by external libraries
+func NewPinTrackerRPCAPI(tracker PinTracker) *PinTrackerRPCAPI {
+	return &PinTrackerRPCAPI{tracker}
+}
+
 // PinTrackerRPCAPI is a go-libp2p-gorpc service which provides the internal
 // peer API for the PinTracker component.
 type PinTrackerRPCAPI struct {
