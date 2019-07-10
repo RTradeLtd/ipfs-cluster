@@ -131,9 +131,9 @@ type PinTrackerRPCAPI struct {
 	tracker PinTracker
 }
 
-// NewIPFSConnectRPCAPI is a helper function to implement the
+// NewIPFSConnectorRPCAPI is a helper function to implement the
 // IPFSConnectorRPCAPI calls by external libraries
-func NewIPFSConnectRPCAPI(connector IPFSConnector) *IPFSConnectorRPCAPI {
+func NewIPFSConnectorRPCAPI(connector IPFSConnector) *IPFSConnectorRPCAPI {
 	return &IPFSConnectorRPCAPI{connector}
 }
 
