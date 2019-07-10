@@ -131,6 +131,12 @@ type PinTrackerRPCAPI struct {
 	tracker PinTracker
 }
 
+// NewIPFSConnectRPCAPI is a helper function to implement the
+// IPFSConnectorRPCAPI calls by external libraries
+func NewIPFSConnectRPCAPI(connector IPFSConnector) *IPFSConnectorRPCAPI {
+	return &IPFSConnectorRPCAPI{connector}
+}
+
 // IPFSConnectorRPCAPI is a go-libp2p-gorpc service which provides the
 // internal peer API for the IPFSConnector component.
 type IPFSConnectorRPCAPI struct {
