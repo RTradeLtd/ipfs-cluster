@@ -18,6 +18,8 @@ func TestAdd(t *testing.T) {
 	sth := test.NewShardingTestHelper()
 	defer sth.Clean(t)
 
+	waitForLeaderAndMetrics(t, clusters)
+
 	t.Run("local", func(t *testing.T) {
 		params := api.DefaultAddParams()
 		params.Shard = false
@@ -41,7 +43,7 @@ func TestAdd(t *testing.T) {
 				t.Error(pin.Error)
 			}
 			if pin.Status != api.TrackerStatusPinned {
-				t.Error("item should be pinned")
+				t.Error("item should be pinned and is", pin.Status)
 			}
 		}
 
